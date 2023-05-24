@@ -6,7 +6,9 @@ ports = serial.tools.list_ports.comports()
 device_list={ }
 for port in ports:
     device_list[port.name]=port.device
-    
+
+
+ser = ' '  
 
 
 
@@ -53,6 +55,7 @@ f2.pack(side=LEFT,fill="y")
 x_val=0  
 y_val=0       # varibles for containing position value of  x,y,z 
 z_val= 0
+
 cut_spd=1       # varibles for containing value of cuting speed
 rpm=1           # varibles for containing value of rpm
 
@@ -60,13 +63,15 @@ rpm=1           # varibles for containing value of rpm
 
 
 #                                     Combobox 1 
-deice = StringVar()
+device = StringVar()
 options=[i for i in device_list.keys()]               # combobox option   
-combo_box1= ttk.Combobox(f2,state="readonly",values=options,textvariable=deice,width=30,height=25)  
+combo_box1= ttk.Combobox(f2,state="readonly",values=options,textvariable=device,width=30,height=25)  
 combo_box1.set("SELECT DEVICE")
 def device_selection(event):
-    deice.set(combo_box1.get())
-    print(deice.get())
+    global ser
+    device.set(combo_box1.get())
+    print(device.get())
+    ser = serial.Serial(device.get(), 115200)
 combo_box1.bind('<<ComboboxSelected>>', device_selection)
 combo_box1.place(x=20, y=20)
 
@@ -154,35 +159,49 @@ f2_0.place(x=280,y=30)
 
 
 def move_frnt():
-    global x_val 
-    x_val = x_val+ eval(tims_x_shift.get())
-    txt1.set(x_val)
+    global y_val 
+    y_val = y_val+ eval(tims_x_shift.get())
+    txt1.set(y_val)
+    if ser!=' ':
+        ser.write((f'G0 Y{y_val}\n').encode('latin-1'))
+
+
 
 def move_back():
-    global x_val
-    x_val =x_val- eval(tims_x_shift.get())
-    txt1.set(x_val)
+    global y_val
+    y_val =y_val- eval(tims_x_shift.get())
+    txt1.set(y_val)
+    if ser!=' ':
+        ser.write((f'G0 Y{y_val}\n').encode('latin-1'))
+
+    
     
 def move_right():
-    global y_val
-    y_val=y_val+ eval(tims_x_shift.get())
-    txt2.set(y_val)
-
+    global x_val
+    x_val=x_val+ eval(tims_x_shift.get())
+    txt2.set(x_val)
+    if ser!=' ':
+        ser.write((f'G0 X{x_val}\n').encode('latin-1'))
 def move_left():
-    global y_val
-    y_val= y_val- eval(tims_x_shift.get())
-    txt2.set(y_val)
+    global x_val
+    x_val= x_val- eval(tims_x_shift.get())
+    txt2.set(x_val)
+    if ser!=' ':
+        ser.write((f'G0 X{x_val}\n').encode('latin-1'))
     
 def move_up():
     global z_val
     z_val =z_val+ eval(tims_x_shift.get())
     txt3.set(z_val)
+    if ser!=' ':
+        ser.write((f'G0 Z{z_val}\n').encode('latin-1'))
 
 def move_dwn():
     global z_val
     z_val = z_val - eval(tims_x_shift.get())
     txt3.set(z_val)
-
+    if ser!=' ':
+        ser.write((f'G0 Z{z_val}\n').encode('latin-1'))
 
 frn = Button(f2_0, text = "front",width=buton_wid,height=buton_hit,command=move_frnt).grid(row=0,column=1,pady=(15,0))
 bak = Button(f2_0, text = "back", width=buton_wid,height=buton_hit,command=move_back).grid(row=2,column=1,pady=(0,15))
